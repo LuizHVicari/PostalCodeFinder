@@ -27,18 +27,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun FindAddressScreen(
     modifier: Modifier = Modifier,
-    findPostalCodeService: FindPostalCodeService = remember { FindPostalCodeService() },
-    coroutineScope: CoroutineScope = rememberCoroutineScope()
+    viewModel: FindAddressViewModel = koinViewModel<FindAddressViewModel>()
 ) {
-    var postalCode by remember { mutableStateOf("") }
-    var address by remember { mutableStateOf(Address()) }
-    var isLoadingAddress by remember { mutableStateOf(false) }
-    var hasError = false
-    var errorMessage = ""
 
     Scaffold { innerPadding ->
         Column(
@@ -47,44 +42,26 @@ fun FindAddressScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             TextField(
-                value = postalCode,
-                onValueChange = { postalCode = it },
+                value = viewModel.state.postalCode,
+                onValueChange = viewModel::onChangePostalCode,
                 modifier = Modifier.fillMaxWidth()
             )
             Button(
-                enabled = postalCode.isNotEmpty(),
-                onClick = {
-                    isLoadingAddress = true
-                    hasError = false
-                    errorMessage = ""
-
-                    coroutineScope.launch {
-                        try {
-                            withContext(Dispatchers.IO) {
-                                address = findPostalCodeService.execute(postalCode)
-                            }
-                        } catch (e: Exception) {
-                            hasError = true
-                            errorMessage = e.toString()
-                        } finally {
-                            isLoadingAddress = false
-                        }
-                    }
-
-                }, modifier = Modifier.fillMaxWidth()
+                enabled = viewModel.state.postalCode.isNotEmpty(),
+                onClick = viewModel::onSearchPostalCode, modifier = Modifier.fillMaxWidth()
             ) {
-                if (isLoadingAddress) {
+                if (viewModel.state.isLoadingAddress) {
                     CircularProgressIndicator()
                     return@Button
                 }
                 Text("Buscar")
             }
             Column(modifier = Modifier.fillMaxWidth()) {
-                AddressRow(label = "CEP:", value = address.postalCode)
-                AddressRow(label = "Logradouro:", value = address.street)
-                AddressRow(label = "Bairro:", value = address.neighborhood)
-                AddressRow(label = "Localidade:", value = address.city)
-                AddressRow(label = "UF:", value = address.state)
+                AddressRow(label = "CEP:", value = viewModel.state.address.postalCode)
+                AddressRow(label = "Logradouro:", value = viewModel.state.address.street)
+                AddressRow(label = "Bairro:", value = viewModel.state.address.neighborhood)
+                AddressRow(label = "Localidade:", value = viewModel.state.address.city)
+                AddressRow(label = "UF:", value = viewModel.state.address.state)
             }
         }
     }

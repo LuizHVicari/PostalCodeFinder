@@ -35,6 +35,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.kotlinx.coroutines.android)
+            implementation(libs.koin.android)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -50,7 +51,9 @@ kotlin {
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
-            implementation("io.ktor:ktor-client-content-negotiation")
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.androidx.lifecycle.viewmodel.compose)
+            implementation(libs.koin.compose.viewmodel)
         }
 
         iosMain.dependencies {
