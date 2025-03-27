@@ -38,7 +38,7 @@ fun FindAddressScreen(
     var address by remember { mutableStateOf(Address()) }
     var isLoadingAddress by remember { mutableStateOf(false) }
     var hasError = false
-    var errorMessage: String = ""
+    var errorMessage = ""
 
     Scaffold { innerPadding ->
         Column(
@@ -61,7 +61,7 @@ fun FindAddressScreen(
                     coroutineScope.launch {
                         try {
                             withContext(Dispatchers.IO) {
-                                findPostalCodeService.execute(postalCode)
+                                address = findPostalCodeService.execute(postalCode)
                             }
                         } catch (e: Exception) {
                             hasError = true
